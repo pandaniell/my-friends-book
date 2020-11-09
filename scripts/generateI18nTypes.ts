@@ -44,7 +44,7 @@ const main = () => {
         factory.createIdentifier(name),
         undefined
       ),
-      factory.createStringLiteral(`../locales/en/${name}.json`)
+      factory.createStringLiteral(`locales/en/${name}.json`)
     );
 
     return { name, importDeclaration };
@@ -87,7 +87,7 @@ const main = () => {
 
   const result = printer.printFile(sourceFile);
 
-  sys.writeFile(path.join(ROOT, "types", "i18n.d.ts"), result);
+  sys.writeFile(path.join(ROOT, "i18n.ts"), result);
 
   if (sys.deleteFile) {
     sys.deleteFile(path.join(ROOT, "scripts", "generateI18nTypes.js"));

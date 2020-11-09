@@ -1,4 +1,5 @@
-import type { I18nMap } from "types/i18n";
+import type { I18nMap } from "i18n";
+import { locales } from "i18n";
 
 export const loadI18nBundle = async <
   T extends keyof I18nMap,
@@ -7,7 +8,7 @@ export const loadI18nBundle = async <
   language: T,
   namespaces: U
 ) => {
-  const chosenLanguage = ["en", "nl"].includes(language) ? language : "en";
+  const chosenLanguage = locales.includes(language) ? language : "en";
 
   const bundles = await Promise.all<[keyof I18nMap[T], I18nMap[T][U[number]]]>(
     namespaces.map(async (namespace) => {

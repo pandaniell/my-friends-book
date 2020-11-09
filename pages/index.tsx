@@ -1,5 +1,6 @@
 import { Box, Container, Heading } from "@chakra-ui/core";
 import { useTranslation } from "@hooks/useTranslation";
+import { locales } from "i18n";
 import { I18nContext } from "I18nProvider";
 import { GetStaticProps } from "next";
 import Head from "next/head";
@@ -14,7 +15,7 @@ const LocalizedComponent = () => {
     <div>
       <p>Current locale: {locale}</p>
       <p>{t("hello")}</p>
-      {["en", "nl"].map((locale, i) => (
+      {locales.map((locale, i) => (
         <Link key={i} href="/" locale={locale}>
           <a>Choose {locale}</a>
         </Link>

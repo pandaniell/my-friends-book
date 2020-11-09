@@ -1,5 +1,5 @@
+import type { I18nMap } from "i18n";
 import { createContext, PropsWithChildren, useEffect } from "react";
-import type { I18nMap } from "./types/i18n";
 
 export interface I18nContext {
   locale: keyof I18nMap;

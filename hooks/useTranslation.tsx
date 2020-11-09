@@ -1,6 +1,6 @@
+import type { I18nMap } from "i18n";
 import { i18nContext } from "I18nProvider";
 import { useCallback, useContext, useMemo } from "react";
-import type { I18nMap } from "../types/i18n";
 
 export function useTranslation<
   T extends keyof I18nMap[keyof I18nMap],
