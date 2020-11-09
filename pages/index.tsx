@@ -1,8 +1,8 @@
 import { Box, Container, Heading } from "@chakra-ui/core";
 import { useTranslation } from "@hooks/useTranslation";
 import { locales } from "i18n";
-import { I18nContext } from "I18nProvider";
-import { GetStaticProps } from "next";
+import type { I18nContext } from "I18nProvider";
+import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { Fragment } from "react";
