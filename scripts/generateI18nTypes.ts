@@ -2,22 +2,23 @@ import path from "path";
 import ts, { factory, sys } from "typescript";
 
 const ROOT = process.cwd();
+const ROOT_FOLDER_NAME = "locales";
+const OUTPUT_PATH = path.join(ROOT, "i18n.ts");
 
-const main = () => {
-  const locales = sys.getDirectories(path.join(ROOT, "locales"));
-  const identifier = "locales";
+const generateI18nTypes = () => {
+  const LOCALE_DIR = sys.getDirectories(path.join(ROOT, ROOT_FOLDER_NAME));
 
-  const localesVariable = factory.createVariableStatement(
-    [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+  const localesArrayAsConst = factory.createVariableStatement(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     factory.createVariableDeclarationList(
       [
         factory.createVariableDeclaration(
-          factory.createIdentifier(identifier),
+          factory.createIdentifier(ROOT_FOLDER_NAME),
           undefined,
           undefined,
           factory.createAsExpression(
             factory.createArrayLiteralExpression(
-              locales.map((locale) => factory.createStringLiteral(locale)),
+              LOCALE_DIR.map((locale) => factory.createStringLiteral(locale)),
               false
             ),
             factory.createTypeReferenceNode(
@@ -31,12 +32,14 @@ const main = () => {
     )
   );
 
-  const sourceFiles = sys.readDirectory(path.join(ROOT, "locales", locales[0]));
+  const sourceFiles = sys.readDirectory(
+    path.join(ROOT, ROOT_FOLDER_NAME, LOCALE_DIR[0])
+  );
 
   const parsedSourceFiles = sourceFiles.map((file) => {
     const { name } = path.parse(file);
 
-    const importDeclaration = factory.createImportDeclaration(
+    const localeImportDeclaration = factory.createImportDeclaration(
       undefined,
       undefined,
       factory.createImportClause(
@@ -44,20 +47,22 @@ const main = () => {
         factory.createIdentifier(name),
         undefined
       ),
-      factory.createStringLiteral(`locales/en/${name}.json`)
+      factory.createStringLiteral(
+        `${ROOT_FOLDER_NAME}/${LOCALE_DIR[0]}/${name}.json`
+      )
     );
 
-    return { name, importDeclaration };
+    return { name, localeImportDeclaration };
   });
 
   const i18nMap = factory.createTypeAliasDeclaration(
     undefined,
-    [ts.createModifier(ts.SyntaxKind.ExportKeyword)],
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     factory.createIdentifier("I18nMap"),
     undefined,
     factory.createTypeReferenceNode(factory.createIdentifier("Record"), [
       factory.createIndexedAccessTypeNode(
-        factory.createTypeQueryNode(factory.createIdentifier(identifier)),
+        factory.createTypeQueryNode(factory.createIdentifier(ROOT_FOLDER_NAME)),
         factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
       ),
       factory.createTypeLiteralNode(
@@ -77,8 +82,8 @@ const main = () => {
 
   const sourceFile = factory.createSourceFile(
     factory.createNodeArray([
-      ...parsedSourceFiles.map((file) => file.importDeclaration),
-      localesVariable,
+      ...parsedSourceFiles.map((file) => file.localeImportDeclaration),
+      localesArrayAsConst,
       i18nMap,
     ]),
     factory.createToken(ts.SyntaxKind.EndOfFileToken),
@@ -87,11 +92,27 @@ const main = () => {
 
   const result = printer.printFile(sourceFile);
 
-  sys.writeFile(path.join(ROOT, "i18n.ts"), result);
-
-  if (sys.deleteFile) {
-    sys.deleteFile(path.join(ROOT, "scripts", "generateI18nTypes.js"));
-  }
+  sys.writeFile(OUTPUT_PATH, result);
 };
 
-main();
+const main = () => {
+  if (!sys.watchDirectory) {
+    throw Error(
+      "sys.watchDirectory is not available to the TypeScript compiler"
+    );
+  }
+
+  console.log(
+    `Starting i18n type generation in watch mode, writing to ${OUTPUT_PATH}`
+  );
+
+  generateI18nTypes();
+
+  sys.watchDirectory(
+    path.join(ROOT, ROOT_FOLDER_NAME),
+    generateI18nTypes,
+    true
+  );
+};
+
+export default main;
