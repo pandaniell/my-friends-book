@@ -58,7 +58,7 @@ const generateI18nTypes = () => {
   const i18nNamespaceInterface = factory.createInterfaceDeclaration(
     undefined,
     [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier("I18nNamespaces"),
+    factory.createIdentifier("I18nNamespace"),
     undefined,
     undefined,
     parsedSourceFiles.map((file) =>

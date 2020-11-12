@@ -1,7 +1,7 @@
 import common from "locales/en/common.json";
 import greetings from "locales/en/greetings.json";
-export type I18nMap = Record<typeof locales[number], I18nNamespaces>;
-export interface I18nNamespaces {
+export type I18nMap = Record<typeof locales[number], I18nNamespace>;
+export interface I18nNamespace {
     common: typeof common;
     greetings: typeof greetings;
 }
