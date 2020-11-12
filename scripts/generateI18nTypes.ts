@@ -55,25 +55,35 @@ const generateI18nTypes = () => {
     return { name, localeImportDeclaration };
   });
 
-  const i18nMap = factory.createTypeAliasDeclaration(
+  const i18nNamespaceInterface = factory.createInterfaceDeclaration(
+    undefined,
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    factory.createIdentifier("I18nNamespaces"),
+    undefined,
+    undefined,
+    parsedSourceFiles.map((file) =>
+      factory.createPropertySignature(
+        undefined,
+        factory.createIdentifier(file.name),
+        undefined,
+        factory.createTypeQueryNode(factory.createIdentifier(file.name))
+      )
+    )
+  );
+
+  const i18nMapType = factory.createTypeAliasDeclaration(
     undefined,
     [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     factory.createIdentifier("I18nMap"),
     undefined,
     factory.createTypeReferenceNode(factory.createIdentifier("Record"), [
       factory.createIndexedAccessTypeNode(
-        factory.createTypeQueryNode(factory.createIdentifier(ROOT_FOLDER_NAME)),
+        factory.createTypeQueryNode(factory.createIdentifier("locales")),
         factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)
       ),
-      factory.createTypeLiteralNode(
-        parsedSourceFiles.map((file) =>
-          factory.createPropertySignature(
-            undefined,
-            factory.createIdentifier(file.name),
-            undefined,
-            factory.createTypeQueryNode(factory.createIdentifier(file.name))
-          )
-        )
+      factory.createTypeReferenceNode(
+        factory.createIdentifier(i18nNamespaceInterface.name.text),
+        undefined
       ),
     ])
   );
@@ -83,8 +93,9 @@ const generateI18nTypes = () => {
   const sourceFile = factory.createSourceFile(
     factory.createNodeArray([
       ...parsedSourceFiles.map((file) => file.localeImportDeclaration),
+      i18nMapType,
+      i18nNamespaceInterface,
       localesArrayAsConst,
-      i18nMap,
     ]),
     factory.createToken(ts.SyntaxKind.EndOfFileToken),
     ts.NodeFlags.None
