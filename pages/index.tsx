@@ -1,7 +1,7 @@
 import { Box, Container, Heading } from "@chakra-ui/core";
 import { useTranslation } from "@hooks/useTranslation";
+import type { I18nMap } from "i18n";
 import { locales } from "i18n";
-import type { I18nContext } from "I18nProvider";
 import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -39,19 +39,16 @@ const Home = () => (
   </Fragment>
 );
 
-export const getStaticProps: GetStaticProps<Record<
-  "i18n",
-  I18nContext
->> = async ({ locale = "en" }) => {
-  const asLocale = locale as I18nContext["locale"];
-  const resources = await loadI18nBundle(asLocale, ["greetings"]);
-  const asResources = (resources as unknown) as I18nContext["resources"];
+export const getStaticProps: GetStaticProps = async ({ locale = "en" }) => {
+  const resources = await loadI18nBundle(locale as keyof I18nMap, [
+    "greetings",
+  ]);
 
   return {
     props: {
       i18n: {
-        locale: asLocale,
-        resources: asResources,
+        locale,
+        resources,
       },
     },
   };

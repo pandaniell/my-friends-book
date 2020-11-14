@@ -1,9 +1,9 @@
-import type { I18nMap } from "i18n";
+import type { I18nMap, I18nNamespace } from "i18n";
 import { createContext, PropsWithChildren, useEffect } from "react";
 
 export interface I18nContext {
   locale: keyof I18nMap;
-  resources: Record<keyof I18nMap, I18nMap[keyof I18nMap]>;
+  resources: Record<keyof I18nMap, Partial<I18nNamespace>>;
 }
 
 export const i18nContext = createContext<I18nContext | null>(null);
